@@ -6,5 +6,5 @@
 #
 with open('data/source.csv', 'r') as file_in, open('data/raw.csv', 'w') as file_out:
     for line in file_in.readlines():
-        line = line.replace(',', '.').replace(';', ',').replace('NULL', '')
+        line = line.replace(',', '.').replace(';', ',').replace('NULL', '').replace('Onbekend', '')
         file_out.write(line)

@@ -4,7 +4,7 @@
 # - Replacing semicolons by commas as separator
 # - Replace "NULL" by actually empty values%
 #
-with open('source.csv', 'r') as file_in, open('raw.csv', 'w') as file_out:
+with open('data/source.csv', 'r') as file_in, open('data/raw.csv', 'w') as file_out:
     for line in file_in.readlines():
         line = line.replace(',', '.').replace(';', ',').replace('NULL', '')
         file_out.write(line)

@@ -96,7 +96,7 @@ def split_surgery_types(df, merge_threshold=1, merge_value='Other'):
     i = 0
     for i, k in enumerate(keys):
         # Generate column for k
-        c = ['Y' if k in l else float('nan') if 'Nan' in l else 'N' for l in types]
+        c = ['J' if k in l else float('nan') if 'Nan' in l else 'N' for l in types]
         df.insert(1 + i, k, c, True)
 
     # Add merge value column with count
@@ -107,19 +107,56 @@ def split_surgery_types(df, merge_threshold=1, merge_value='Other'):
     return df
 
 
+numeric_columns = ['Leeftijd', 'Euroscore1', 'Euroscore2', 'BMI', 'CCS', 'NYHA', 'Geplande operatieduur',
+                   'Operatieduur', 'Ziekenhuis ligduur', 'IC ligduur', 'Aantal anastomosen']
+
+# Fill na method: M (Mode or mean), S (Separate category or -1)
+fill = ['M', 'S']
+allow = ['C', 'N']
+rows = ['A', 'F']
+thresholds = [1, 3]
+
+# Create new datasets
 if __name__ == '__main__':
     # Set new CSV name
     data_csv = 'data/data.csv'
 
     # Rewrite to new CSV and load data
     raw_to_csv('data/raw.csv', data_csv)
-    data = pd.read_csv(data_csv)
 
-    # Remove rows that do not have the Operatieduur variable
-    data = data[data.Operatieduur.notnull()]
+    for (f, a, r, t) in [(f, a, r, t) for f in fill for a in allow for r in rows for t in thresholds]:
+        df = pd.read_csv(data_csv)
 
-    # Split surgical types
-    data = split_surgery_types(data)
+        # Remove rows that do not have the Operatieduur variable
+        df = df[df.Operatieduur.notnull()]
 
-    # Write back to CSV
-    data.to_csv(data_csv, index=False)
+        # Split surgical types, merge by t, drop Operatietype
+        df = split_surgery_types(df, merge_threshold=t)
+        df = df.drop(columns='Operatietype')
+
+        # If rows = F (Filled), remove rows with a lot of empty values (where Geslacht is missing)
+        if r == 'F':
+            df = df[df.Geslacht.notnull()]
+
+        # Fill NA values
+        for c in df.columns:
+            if c in numeric_columns:
+                df[c] = pd.to_numeric(df[c], errors='coerce')
+                if f == 'M':
+                    df[c] = df[c].fillna(df[c].mean())
+                else:
+                    df[c] = df[c].fillna(-1)
+            else:
+                if f == 'M':
+                    mode = df[df[c].notnull()][c].mode()[0]
+                    df[c] = df[c].fillna(mode)
+                else:
+                    df[c] = df[c].fillna('U')
+
+        # If allow == N (Numerical): Convert categories to numerical values
+        if a == 'N':
+            df = pd.get_dummies(df)
+
+        df.to_csv('data/data-%s%s%s%s.csv' % (f, a, r, t), index=False)
+
+        print('Null values:', 'data/data-%s%s%s%s.csv' % (f, a, r, t), df.isnull().sum().sum())

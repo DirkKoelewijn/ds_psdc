@@ -49,7 +49,7 @@ replacements = {
 
 
 # Splits the surgery type
-def split_surgery_types(df, merge_threshold=3, merge_value='Other'):
+def split_surgery_types(df, merge_threshold=1, merge_value='Other'):
     # Get the surgical types as list
     types = df.Operatietype.tolist()
 
@@ -89,7 +89,8 @@ def split_surgery_types(df, merge_threshold=3, merge_value='Other'):
 
     # Remove NaN and the merge value
     keys.remove('Nan')
-    keys.remove(merge_value)
+    if (len(remove)) > 0:
+        keys.remove(merge_value)
 
     # Add new columns for the other values
     i = 0
@@ -99,8 +100,9 @@ def split_surgery_types(df, merge_threshold=3, merge_value='Other'):
         df.insert(1 + i, k, c, True)
 
     # Add merge value column with count
-    c = [l.count(merge_value) if 'Nan' not in l else float('nan') for l in types]
-    df.insert(i + 2, merge_value, c, True)
+    if (len(remove)) > 0:
+        c = [l.count(merge_value) if 'Nan' not in l else float('nan') for l in types]
+        df.insert(i + 2, merge_value, c, True)
 
     return df
 

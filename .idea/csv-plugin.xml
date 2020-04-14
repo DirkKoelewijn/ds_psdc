@@ -17,6 +17,13 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="\experiment\real_estate.csv">
+          <value>
+            <Attribute>
+              <option name="valueSeparator" value="COMMA" />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="\source.csv">
           <value>
             <Attribute>

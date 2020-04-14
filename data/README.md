@@ -13,19 +13,19 @@ Used `mean()` to fill numerical values, `mode()` to fill categorical values.
 #### S: Use separate value
 Used `-1` to fill numerical values, `"U"` to fill categorical values.
 
-## 2. Allow categorical values
+## 2. Allow categorical values (C/N)
 #### C: Allow categories
 Did not change the data set.
 #### N: Only allow numerical values
 Used `pd.get_dummies()` to convert categories into numerical values.
 
-## 3: Used observartions
+## 3: Used observartions (A/F)
 #### A: All observations
 Did not change the data set.
 #### F: Use filled observations only
 Excluded rows that have a large amount of missing values.
 
-## 4: Merge surgical types
+## 4: Merge surgical types (1/3)
 #### 1: Do not merge
 Did not change the data set.
 #### 3: Merge types that occur less than <3 times

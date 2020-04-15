@@ -123,6 +123,10 @@ if __name__ == '__main__':
 
     # Rewrite to new CSV and load data
     raw_to_csv('data/raw.csv', data_csv)
+    df = pd.read_csv(data_csv)
+    df_obj = df.select_dtypes(['object'])
+    df[df_obj.columns] = df_obj.apply(lambda x: x.str.strip())
+    df.to_csv(data_csv, index=False)
 
     for (f, a, r, t) in [(f, a, r, t) for f in fill for a in allow for r in rows for t in thresholds]:
         df = pd.read_csv(data_csv)
@@ -132,7 +136,7 @@ if __name__ == '__main__':
 
         # Split surgical types, merge by t, drop Operatietype
         df = split_surgery_types(df, merge_threshold=t)
-        df = df.drop(columns='Operatietype')
+        df = df.drop(columns=['Operatietype', 'Geplande operatieduur', 'Ziekenhuis ligduur', 'IC ligduur'])
 
         # If rows = F (Filled), remove rows with a lot of empty values (where Geslacht is missing)
         if r == 'F':
